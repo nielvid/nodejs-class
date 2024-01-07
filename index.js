@@ -1,5 +1,9 @@
 import express from 'express'
+import mongoose from 'mongoose'
+import dotenv from 'dotenv'
 import route from './routes.js'
+
+dotenv.config()
 
 const app = express()
 
@@ -17,9 +21,26 @@ app.use((err, req, res, next)=>{
 })
 
 
-app.listen(8080, 'localhost', () => {
-  console.log('Server running on port http://localhost:8080')
-})
+mongoose
+  .connect(process.env.MONGO_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(()=>{  
+    console.log('database connected')
+    app.listen(8080, 'localhost', () => {
+      console.log('Server running on port http://localhost:8080')
+    })
+  
+  })
+  .catch((error)=>{
+console.log('db connection error', error)
+  })
+
+
+
+
+
 
 
 

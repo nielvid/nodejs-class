@@ -1,21 +1,19 @@
 import { bookStore } from './database.js'
+import { Book } from './models/books.js'
 
 export function homepage(req, res) {
   res.send('Welcome to AYZ BookStore')
 }
 
-export function getAllBooks(req, res) {
-  res.send(bookStore)
+export async function getAllBooks(req, res) {
+const books =  await Book.find()
+  res.send(books)
 }
 
-export function getOneBook(req, res) {
+export async function getOneBook(req, res) {
   const id = req.params.id
-  console.log(id, 'id of book requested for')
-  const requestedBook = bookStore.find((element) => {
-    return element.id == id
-  })
-  console.log(requestedBook)
-  res.send(requestedBook)
+  const book = await Book.findOne({_id: id})
+  res.send(book)
 }
 
 export function searchForBooks(req, res) {
@@ -46,7 +44,8 @@ export function searchForBooks(req, res) {
   }
 }
 
-export function postABook(req, res) {
+export async function postABook(req, res) {
+
   try {
     const data = req.body
     if (!data.isbn) {
@@ -61,9 +60,12 @@ export function postABook(req, res) {
     }
     if (!typeof data.yearPublised == 'number') {
       throw new Error('yearPublised should be a number')
+
     }
-    bookStore.push(data)
-    res.send(bookStore)
+    const book = await Book.create({...data})
+    
+    // bookStore.push(data)
+    res.send(book)
   } catch (error) {
     throw new Error(error.message)
   }
@@ -73,9 +75,12 @@ export function updateABook(req, res) {}
 
 export function deleteABook(req, res) {}
 
-//  const book = {
-//    author: 'Katherine Pen',
-//    title: 'The return of Katherine',
-//    yearPublished: 2002,
-//    isbn: 'ad3qw2',
-//  }
+
+
+
+
+
+
+
+
+
