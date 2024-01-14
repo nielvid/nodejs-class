@@ -1,18 +1,18 @@
-import { bookStore } from './database.js'
-import { Book } from './models/books.js'
+import { bookStore } from '../database.js'
+import { Book } from '../models/books.js'
 
 export function homepage(req, res) {
   res.send('Welcome to AYZ BookStore')
 }
 
 export async function getAllBooks(req, res) {
-const books =  await Book.find()
+  const books = await Book.find()
   res.send(books)
 }
 
 export async function getOneBook(req, res) {
   const id = req.params.id
-  const book = await Book.findOne({_id: id})
+  const book = await Book.findOne({ _id: id })
   res.send(book)
 }
 
@@ -45,7 +45,6 @@ export function searchForBooks(req, res) {
 }
 
 export async function postABook(req, res) {
-
   try {
     const data = req.body
     if (!data.isbn) {
@@ -60,10 +59,9 @@ export async function postABook(req, res) {
     }
     if (!typeof data.yearPublised == 'number') {
       throw new Error('yearPublised should be a number')
-
     }
-    const book = await Book.create({...data})
-    
+    const book = await Book.create({ ...data })
+
     // bookStore.push(data)
     res.send(book)
   } catch (error) {
@@ -71,16 +69,7 @@ export async function postABook(req, res) {
   }
 }
 
+// Asignment
 export function updateABook(req, res) {}
 
 export function deleteABook(req, res) {}
-
-
-
-
-
-
-
-
-
-

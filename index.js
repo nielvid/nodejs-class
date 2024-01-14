@@ -1,7 +1,7 @@
 import express from 'express'
 import mongoose from 'mongoose'
 import dotenv from 'dotenv'
-import route from './routes.js'
+import route from './routes/routes.js'
 
 dotenv.config()
 
@@ -12,7 +12,7 @@ app.use(express.json())
 app.use(route)
 //global error handler
 app.use((err, req, res, next)=>{
-    res.json({
+    return res.json({
         status: 'error',
         statusCode: 400,
         message: err.message,
@@ -21,10 +21,9 @@ app.use((err, req, res, next)=>{
 })
 
 
+
 mongoose
   .connect(process.env.MONGO_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
   })
   .then(()=>{  
     console.log('database connected')

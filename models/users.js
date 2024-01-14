@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import bcrypt from 'bcryptjs'
+// import bcrypt from 'bcryptjs'
 
 const Schema = new mongoose.Schema({
   firstName: {
@@ -10,12 +10,17 @@ const Schema = new mongoose.Schema({
     type: String,
     required: [true, 'lastName is required'],
   },
-  
+
   email: {
     type: String,
     required: [true, 'Email is required'],
     unique: true,
     lower: true,
+  },
+
+  password: {
+    type: String,
+    required: [true, 'password is required'],
   },
   address: {
     houseNumber: { type: String },
@@ -30,9 +35,8 @@ const Schema = new mongoose.Schema({
     unique: true,
     required: [true, 'telephone is required'],
   },
-
- 
 })
+
 
 // Schema.pre('save', async (next) => {
 //   if (!this.isModified('password')) return next()
