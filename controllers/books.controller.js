@@ -70,6 +70,8 @@ export async function postABook(req, res) {
 }
 
 // Asignment
-export function updateABook(req, res) {}
+export function updateABook(req, res) {
+ 
+}
 
 export function deleteABook(req, res) {}
