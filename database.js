@@ -43,11 +43,3 @@ export const bookStore = [
  
 
 
-
-// module.exports = {users, authors, bookStore}
-
-// working area
-
-// staging area
-
-//head
