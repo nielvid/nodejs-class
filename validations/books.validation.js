@@ -2,7 +2,7 @@
 import Joi from 'joi'
 import Exception from '../exception.js'
 
-const signUpschema = Joi.object({
+const bookSchema = Joi.object({
   firstName: Joi.string().required().min(3),
   lastName: Joi.string().required().min(3),
   email: Joi.string().email().required(),
@@ -12,21 +12,14 @@ const signUpschema = Joi.object({
 })
 
 
-const loginschema = Joi.object({
-
-  email: Joi.string().email().required(),
-  password: Joi.string().required().min(8),
-
-})
-
-export const validateSignup = (
+export const validateBook = (
   req,
   res,
   next
 ) => {
  
 
-   const {error} = signUpschema.validate(req.body)
+   const { error } = bookSchema.validate(req.body)
    if (error) {
 
      const { details } = error
@@ -34,17 +27,6 @@ export const validateSignup = (
      next(new Exception (message, 400))
    }
    next()
-}
-
-
-export const validateLogin = (req, res, next) => {
-  const { error } = loginschema.validate(req.body)
-  if (error) {
-    const { details } = error
-    const message = details.map((i) => i.message).join(',')
-    next(new Exception(message, 400))
-  }
-  next()
 }
 
 

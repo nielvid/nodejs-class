@@ -1,5 +1,7 @@
 import { bookStore } from '../database.js'
+import Exception from '../exception.js'
 import { Book } from '../models/books.js'
+import User from '../models/users.js'
 
 export function homepage(req, res) {
   res.send('Welcome to AYZ BookStore')
@@ -46,6 +48,11 @@ export function searchForBooks(req, res) {
 
 export async function postABook(req, res) {
   try {
+    
+    const user = await User.findOne({ _id: req.user._id })
+    if(!user){
+      throw new Exception('author not found', 400)
+    }
     const data = req.body
     if (!data.isbn) {
       throw new Error('isbn is required')
