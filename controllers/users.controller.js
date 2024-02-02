@@ -7,17 +7,17 @@ import jwt from 'jsonwebtoken'
 
 export async function signUp(req, res, next) {
    try {
+     const data = req.body
      const userExist = await User.findOne({ email: data.email })
 
      if (userExist) {
        throw new Exception('user already exists', 400)
      }
 
-     const data = req.body
      const hashedPassword = await bcrypt.hash(data.password, 10)
 
      const user = await User.create({ ...data, password: hashedPassword })
-     user.password = null
+    user.password = null
      res.send(user)
    } catch (error) {
      next(new Exception(error.message, 400))
