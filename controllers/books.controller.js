@@ -1,21 +1,35 @@
 import { bookStore } from '../database.js'
 import Exception from '../exception.js'
+import Author from '../models/authors.js'
 import { Book } from '../models/books.js'
+import BorrowedBook from '../models/borrowed-books.js'
 import User from '../models/users.js'
 
 export function homepage(req, res) {
   res.send('Welcome to AYZ BookStore')
 }
 
-export async function getAllBooks(req, res) {
+export async function getAllBooks(req, res, next) {
   const books = await Book.find()
   res.send(books)
 }
 
+export async function findABook(bookId) {
+  const book = await Book.findOne({ _id: bookId })
+  if (!book) {
+    throw new Exception('book not found')
+  }
+  return book
+}
+
 export async function getOneBook(req, res) {
-  const id = req.params.id
-  const book = await Book.findOne({ _id: id })
-  res.send(book)
+  try {
+    const id = req.params.id
+    const book = await fidnABook(id)
+    res.send(book)
+  } catch (error) {
+    next(new Exception(error.message, error.status))
+  }
 }
 
 export function searchForBooks(req, res) {
@@ -46,20 +60,20 @@ export function searchForBooks(req, res) {
   }
 }
 
-export async function postABook(req, res) {
+export async function postABook(req, res, next) {
   try {
-    
-    const user = await User.findOne({ _id: req.user._id })
-    if(!user){
+    const author = await Author.findOne({ user: req.user._id }).populate({
+      path: 'user',
+    })
+    console.log(author, 'djhdhdh')
+    if (!author) {
       throw new Exception('author not found', 400)
     }
     const data = req.body
     if (!data.isbn) {
       throw new Error('isbn is required')
     }
-    if (!data.author) {
-      throw new Error('author is required')
-    }
+  
 
     if (data.isbn.length < 6) {
       throw new Error('isbn cannot be less than 6 characters')
@@ -67,18 +81,45 @@ export async function postABook(req, res) {
     if (!typeof data.yearPublised == 'number') {
       throw new Error('yearPublised should be a number')
     }
-    const book = await Book.create({ ...data })
-
-    // bookStore.push(data)
+    const book = await Book.create({ ...data, author: author._id })
     res.send(book)
   } catch (error) {
-    throw new Error(error.message)
+    next(new Exception(error.message, 400))
+  }
+}
+export async function borrowABook(req, res, next) {
+  try {
+    const payload = req.body
+    //get the user whose is currently looged in from req.user
+    const userId = req.user._id
+
+    const borrower = await User.findOne({ _id: userId })
+    if (!borrower) {
+      throw new Exception('user not found', 400)
+    }
+
+    //find the requested book
+    const book = await findABook(payload.bookId)
+    if (book.isAvaialable == false) {
+      throw new Exception('book is not available currently', 400)
+    }
+
+    //create  the borrowed book record
+    const data = {
+      borrower: borrower._id,
+      dateToBeReturned: payload.dateToBeReturned,
+      book: book._id,
+    }
+    const bookBorrowed = await BorrowedBook.create({ ...data })
+
+    res.send(bookBorrowed)
+  } catch (error) {
+    next(new Exception(error.message, 400))
   }
 }
 
 // Asignment
-export function updateABook(req, res) {
- 
-}
+export function updateABook(req, res) {}
 
 export function deleteABook(req, res) {}
+

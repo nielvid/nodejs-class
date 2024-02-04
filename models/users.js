@@ -36,11 +36,19 @@ const Schema = new mongoose.Schema({
     required: [true, 'telephone is required'],
   },
 
-  // role: {
-  //   type: String,
-  //   enum:['reader', 'author', 'admin'],
-  //   required: [true, 'Email is required'],
-  // },
+  role: {
+    type: String,
+    enum: ['reader', 'author', 'admin'],
+    default: 'reader',
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
 })
 
 
@@ -54,3 +62,5 @@ const Schema = new mongoose.Schema({
 const User = mongoose.model('users', Schema)
 
 export default User
+
+

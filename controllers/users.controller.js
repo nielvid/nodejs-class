@@ -1,4 +1,5 @@
 import Exception from "../exception.js"
+import Author from "../models/authors.js"
 import User from "../models/users.js"
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
@@ -17,6 +18,9 @@ export async function signUp(req, res, next) {
      const hashedPassword = await bcrypt.hash(data.password, 10)
 
      const user = await User.create({ ...data, password: hashedPassword })
+     if(data.role == 'author')  {
+      await Author.create({ user: user._id })
+     }
     user.password = null
      res.send(user)
    } catch (error) {
@@ -56,4 +60,21 @@ export async function login(req, res, next) {
      next(new Exception(error.message, 400))
  }
 }
+
+export function searchForUser(req, res, next) {
+
+  try {
+    const query = req.query.data
+let user
+    if (query.firstName || query.lastName) {
+
+    user = User.find({$or: [{firstName: query.firstName}, {lastName: query.lastname}]}) 
+    }
+    res.send(user)
+  } catch (error) {
+    next(new Exception(error.message, 400))
+  }
+}
+
 // implements findAllUsers, findOneuser
+

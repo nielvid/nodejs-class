@@ -8,7 +8,7 @@ const signUpschema = Joi.object({
   email: Joi.string().email().required(),
   password: Joi.string().required().min(8),
   telephone: Joi.string().required().min(11).max(14).trim(),
-  
+  role: Joi.string().optional()
 })
 
 

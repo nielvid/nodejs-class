@@ -2,26 +2,29 @@ import mongoose, {Schema, model} from 'mongoose'
 
 
 const BookSchema = new Schema({
-
   author: {
-    type: String,
-    required: true
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'authors',
+    required: true,
   },
 
   title: String,
   yearPublished: Number,
 
-  isbn:{
+ image: String,
+
+  isbn: {
     type: String,
-    required: true
-  }
-  // user:{
+    required: true,
+  },
+  quantity: {
+    type: Number,
+    default: 1,
+  },
 
-  // }
-  // author:{
-
-  // }
-
+  isAvaialable: {
+    type: Boolean,
+  },
 })
 
 
