@@ -4,6 +4,20 @@ import Author from '../models/authors.js'
 import { Book } from '../models/books.js'
 import BorrowedBook from '../models/borrowed-books.js'
 import User from '../models/users.js'
+import cloudinary  from 'cloudinary'
+import dotenv from 'dotenv'
+import fs from 'fs'
+
+dotenv.config()
+
+cloudinary.config({
+  cloud_name:  process.env.CLOUDINARY_NAME,
+  secure: true,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+})
+
+
 
 export function homepage(req, res) {
   res.send('Welcome to AYZ BookStore')
@@ -11,7 +25,14 @@ export function homepage(req, res) {
 
 export async function getAllBooks(req, res, next) {
   const books = await Book.find()
-  res.send(books)
+   res.send({
+     status: 'sucess',
+     statusCode: 200,
+     message: 'book found',
+     data: {
+       books,
+     },
+   })
 
 }
 
@@ -27,7 +48,14 @@ export async function getOneBook(req, res,next) {
   try {
     const id = req.params.id
     const book = await findABook(id)
-    res.send(book)
+    res.send({
+      status: 'sucess',
+      statusCode: 200,
+      message: 'books found',
+      data: {
+        book,
+      },
+    })
   } catch (error) {
     next(new Exception(error.message, error.status))
   }
@@ -54,7 +82,14 @@ export function searchForBooks(req, res) {
       })
     }
 
-    res.send(book)
+    res.send({
+      status: 'sucess',
+      statusCode: 200,
+      message: 'books found',
+      data: {
+        book,
+      },
+    })
   } catch (error) {
     throw new Error(error.message)
   }
@@ -72,7 +107,14 @@ export async function postABook(req, res, next) {
     const data = req.body
  
     const book = await Book.create({ ...data, author: author._id })
-    res.send(book)
+   res.send({
+     status: 'sucess',
+     statusCode: 201,
+     message: 'book posted',
+     data: {
+       book,
+     },
+   })
   } catch (error) {
     next(new Exception(error.message, 400))
   }
@@ -102,7 +144,16 @@ export async function borrowABook(req, res, next) {
     }
     const bookBorrowed = await BorrowedBook.create({ ...data })
 
-    res.send(bookBorrowed)
+    res.send(
+      res.send({
+        status: 'sucess',
+        statusCode: 201,
+        message: 'book borrowed',
+        data: {
+          book :bookBorrowed,
+        },
+      })
+    )
   } catch (error) {
     next(new Exception(error.message, 400))
   }
@@ -112,8 +163,43 @@ export async function borrowABook(req, res, next) {
 export function updateABook(req, res) {}
 
 export async function deleteABook(req, res) {
-      await Book.deleteMany()
-      res.send("books deleted")
+      await Book.findByIdAndDelete({_id:req.params.id })
+        res.send({
+          status: 'sucess',
+          statusCode: 200,
+          message: 'book deleted',
+          data: 'book deleted',
+        })
 
 }
 
+export async function deleteBooks(req, res) {
+  await Book.deleteMany()
+  res.send({
+    status: 'sucess',
+    statusCode: 200,
+    message: 'books deleted',
+    data: 'books deleted',
+  })
+}
+
+
+export async function uploadImage(req, res, next){
+  try {
+ if (!req.file) {
+   throw new Exception('no file uploaded', 400)
+ }
+    const result = await cloudinary.uploader.upload(req.file.path)
+    fs.unlinkSync(req.file.path)
+    res.send({
+      status: 'success',
+      statusCode: 200,
+      message: 'image upload was sucessfull',
+      data: {
+        url: result.secure_url,
+      },
+    })
+  } catch (error) {
+     next(new Exception(error.message, 400))
+  }
+}
