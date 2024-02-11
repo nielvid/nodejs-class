@@ -12,6 +12,7 @@ export function homepage(req, res) {
 export async function getAllBooks(req, res, next) {
   const books = await Book.find()
   res.send(books)
+
 }
 
 export async function findABook(bookId) {
@@ -22,10 +23,10 @@ export async function findABook(bookId) {
   return book
 }
 
-export async function getOneBook(req, res) {
+export async function getOneBook(req, res,next) {
   try {
     const id = req.params.id
-    const book = await fidnABook(id)
+    const book = await findABook(id)
     res.send(book)
   } catch (error) {
     next(new Exception(error.message, error.status))
@@ -53,7 +54,6 @@ export function searchForBooks(req, res) {
       })
     }
 
-    console.log(q, 'query object')
     res.send(book)
   } catch (error) {
     throw new Error(error.message)
@@ -65,22 +65,12 @@ export async function postABook(req, res, next) {
     const author = await Author.findOne({ user: req.user._id }).populate({
       path: 'user',
     })
-    console.log(author, 'djhdhdh')
+
     if (!author) {
       throw new Exception('author not found', 400)
     }
     const data = req.body
-    if (!data.isbn) {
-      throw new Error('isbn is required')
-    }
-  
-
-    if (data.isbn.length < 6) {
-      throw new Error('isbn cannot be less than 6 characters')
-    }
-    if (!typeof data.yearPublised == 'number') {
-      throw new Error('yearPublised should be a number')
-    }
+ 
     const book = await Book.create({ ...data, author: author._id })
     res.send(book)
   } catch (error) {
@@ -121,5 +111,9 @@ export async function borrowABook(req, res, next) {
 // Asignment
 export function updateABook(req, res) {}
 
-export function deleteABook(req, res) {}
+export async function deleteABook(req, res) {
+      await Book.deleteMany()
+      res.send("books deleted")
+
+}
 
